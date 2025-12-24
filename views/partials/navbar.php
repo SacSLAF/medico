@@ -30,7 +30,7 @@ $currentRole = isset($_SESSION['role_name']) ? $_SESSION['role_name'] : 'User';
                         <i class="fas fa-tachometer-alt mr-1"></i> Dashboard
                     </a> -->
 
-                    <?php if ($_SESSION['role'] == ROLE_SUPER_ADMIN || $_SESSION['role'] == ROLE_ADMIN): ?>
+                    <?php if ($_SESSION['role'] == ROLE_SUPER_ADMIN): ?>
                         <!-- <a href="<?php echo BASE_URL; ?>users" 
                        class="<?php echo (strpos($_SERVER['REQUEST_URI'], 'users') !== false) ? 'bg-blue-50 text-blue-700' : 'text-gray-700 hover:bg-gray-100'; ?> px-3 py-2 rounded-md text-sm font-medium transition">
                         <i class="fas fa-users mr-1"></i> Users
@@ -122,7 +122,7 @@ $currentRole = isset($_SESSION['role_name']) ? $_SESSION['role_name'] : 'User';
                 <i class="fas fa-tachometer-alt mr-3"></i> Dashboard
             </a>
 
-            <?php if ($_SESSION['role'] == ROLE_SUPER_ADMIN || $_SESSION['role'] == ROLE_ADMIN): ?>
+            <?php if ($_SESSION['role'] == ROLE_SUPER_ADMIN): ?>
                 <a href="<?php echo BASE_URL; ?>users"
                     class="<?php echo (strpos($_SERVER['REQUEST_URI'], 'users') !== false) ? 'bg-blue-50 text-blue-700' : 'text-gray-700 hover:bg-gray-100'; ?> block px-3 py-3 rounded-md text-base font-medium transition">
                     <i class="fas fa-users mr-3"></i> Users
