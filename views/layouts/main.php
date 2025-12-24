@@ -1,29 +1,49 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?php echo isset($title) ? $title . ' | ' . APP_NAME : APP_NAME; ?></title>
-    
+
     <!-- Tailwind CSS -->
     <!-- <script src="https://cdn.tailwindcss.com"></script> -->
-     <link rel="stylesheet" href="<?php echo BASE_URL; ?>assets/css/tailwind.css">
-    
+    <link rel="stylesheet" href="<?php echo BASE_URL; ?>assets/css/tailwind.css">
+
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
+
     <!-- Custom CSS -->
     <style>
         .flash-message {
             animation: fadeOut 5s forwards;
         }
+
         @keyframes fadeOut {
-            0% { opacity: 1; }
-            90% { opacity: 1; }
-            100% { opacity: 0; display: none; }
+            0% {
+                opacity: 1;
+            }
+
+            90% {
+                opacity: 1;
+            }
+
+            100% {
+                opacity: 0;
+                display: none;
+            }
+        }
+
+        .mobile-menu {
+            transform: translateX(-100%);
+            transition: transform 0.3s ease-in-out;
+        }
+
+        .mobile-menu.open {
+            transform: translateX(0);
         }
     </style>
-    
+
     <!-- <script>
         tailwind.config = {
             theme: {
@@ -40,31 +60,31 @@
         }
     </script> -->
 </head>
+
 <body class="bg-gray-50">
-    <?php 
+    <?php
     if (isset($showNavbar) && $showNavbar && isset($_SESSION['user_id'])) {
         include '../views/partials/navbar.php';
     }
     ?>
-    
+
     <main class="min-h-screen">
-        <?php 
+        <?php
         // Display flash messages
         if (isset($_SESSION['flash'])) {
             foreach ($_SESSION['flash'] as $type => $message) {
-                $bgColor = $type == 'success' ? 'bg-green-100 border-green-400 text-green-700' : 
-                           ($type == 'error' ? 'bg-red-100 border-red-400 text-red-700' : 
-                           'bg-blue-100 border-blue-400 text-blue-700');
-                echo "<div class='flash-message $bgColor border px-4 py-3 rounded mx-4 mt-4'>" . 
-                     htmlspecialchars($message) . "</div>";
+                $bgColor = $type == 'success' ? 'bg-green-100 border-green-400 text-green-700' : ($type == 'error' ? 'bg-red-100 border-red-400 text-red-700' :
+                        'bg-blue-100 border-blue-400 text-blue-700');
+                echo "<div class='flash-message $bgColor border px-4 py-3 rounded mx-4 mt-4'>" .
+                    htmlspecialchars($message) . "</div>";
                 unset($_SESSION['flash'][$type]);
             }
         }
         ?>
-        
+
         <?php echo $content ?? ''; ?>
     </main>
-    
+
     <script>
         // Auto-hide flash messages
         setTimeout(() => {
@@ -72,6 +92,53 @@
                 msg.style.display = 'none';
             });
         }, 5000);
+
+        // Mobile menu toggle function
+        function toggleMobileMenu() {
+            const mobileMenu = document.getElementById('mobile-menu');
+            mobileMenu.classList.toggle('hidden'); // Remove/Add hidden
+            mobileMenu.classList.toggle('open'); // Add/Remove open
+
+            // Toggle body scroll
+            document.body.style.overflow = mobileMenu.classList.contains('open') ? 'hidden' : 'auto';
+        }
+
+        // Close mobile menu when clicking outside
+        document.addEventListener('click', function(event) {
+            const mobileMenu = document.getElementById('mobile-menu');
+            const menuButton = document.getElementById('menu-button');
+
+            if (mobileMenu && menuButton) {
+                if (!mobileMenu.contains(event.target) && !menuButton.contains(event.target) && mobileMenu.classList.contains('open')) {
+                    toggleMobileMenu();
+                }
+            }
+        });
+
+        // Close mobile menu when clicking on a link
+        document.querySelectorAll('#mobile-menu a').forEach(link => {
+            link.addEventListener('click', function() {
+                const mobileMenu = document.getElementById('mobile-menu');
+                if (mobileMenu && mobileMenu.classList.contains('open')) {
+                    toggleMobileMenu();
+                }
+            });
+        });
+
+        // Auto-hide flash messages
+        setTimeout(() => {
+            document.querySelectorAll('.flash-message').forEach(msg => {
+                msg.style.display = 'none';
+            });
+        }, 5000);
+
+        // Close flash message on click
+        document.querySelectorAll('.flash-message').forEach(msg => {
+            msg.addEventListener('click', function() {
+                this.style.display = 'none';
+            });
+        });
     </script>
 </body>
+
 </html>
