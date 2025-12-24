@@ -1,25 +1,24 @@
-name: Deploy Medico to cPanel
+name: Deploy Medico via FTP
 
 on:
   push:
     branches:
-      - main
+      - main  # Change if your main branch has a different name
 
 jobs:
-  deploy:
+  ftp-deploy:
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v3
 
-      - name: Deploy via rsync over SSH
-        uses: burnett01/rsync-deployments@7.0.1
+      - name: FTP Deploy
+        uses: SamKirkland/FTP-Deploy-Action@v4.5.0
         with:
-          switches: -avz --delete
-          path: ./
-          remote_path: /home/sachintha/public_html/medico
-          remote_host: ${{ secrets.SSH_HOST }}
-          remote_user: ${{ secrets.SSH_USER }}
-          remote_key: ${{ secrets.SSH_KEY }}
-          remote_port: ${{ secrets.SSH_PORT }}
+          server: ${{ secrets.FTP_HOST }}       # Your server IP or domain
+          username: ${{ secrets.FTP_USER }}     # Your cPanel FTP username
+          password: ${{ secrets.FTP_PASSWORD }} # Your cPanel FTP password
+          local-dir: ./                           # Your repo folder to deploy
+          server-dir: /public_html/medico        # Target folder on server
+          git-ftp-args: --insecure               # Optional, ignore SSL issues
