@@ -55,6 +55,7 @@ class SystemSettingsController
             'upload_max_filesize' => ini_get('upload_max_filesize'),
             'max_execution_time' => ini_get('max_execution_time'),
         ];
+        $systemStatus = $this->getSystemStatus();
 
         include dirname(__DIR__) . '/views/system-settings/index.php';
     }

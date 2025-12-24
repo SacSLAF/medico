@@ -18,14 +18,18 @@ require_once $root_path . '/config/constants.php';
 
 // Get URL
 $url = $_GET['url'] ?? 'auth/login';
+$url = $_GET['url'] ?? 'patient/registerForm';
 
 // Remove trailing slash
 $url = rtrim($url, '/');
 
 // Split URL into parts
 $url_parts = explode('/', $url);
-$controller_name = $url_parts[0] ?? 'auth';
-$method_name = $url_parts[1] ?? 'login';
+// $controller_name = $url_parts[0] ?? 'auth';
+// $method_name = $url_parts[1] ?? 'login';
+
+$controller_name = $url_parts[0] ?? 'patient';
+$method_name = $url_parts[1] ?? 'registerForm';
 
 // Map URLs to controllers
 $routes = [
@@ -34,6 +38,7 @@ $routes = [
     'users' => 'UserController',
     'reports' => 'ReportsController',
     'system-settings' => 'SystemSettingsController',
+    'patient' => 'PatientController', 
     // Add more controllers here as we create them
 ];
 
