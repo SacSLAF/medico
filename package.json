@@ -1,0 +1,19 @@
+{
+  "name": "medico",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "dev": "tailwindcss -i ./public/assets/css/src/tailwind.css -o ./public/assets/css/tailwind.css --watch",
+    "build": "tailwindcss -i ./public/assets/css/src/tailwind.css -o ./public/assets/css/tailwind.css --minify"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "devDependencies": {
+    "autoprefixer": "^10.4.23",
+    "postcss": "^8.5.6",
+    "tailwindcss": "^3.4.19"
+  }
+}
