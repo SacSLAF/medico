@@ -15,7 +15,11 @@ $currentRole = isset($_SESSION['role_name']) ? $_SESSION['role_name'] : 'User';
                         <div class="h-8 w-8 bg-blue-600 rounded-md flex items-center justify-center">
                             <i class="fas fa-heartbeat text-white"></i>
                         </div>
-                        <span class="ml-2 text-xl font-bold text-gray-800"><?php echo APP_NAME; ?></span>
+                        <!-- <span class="ml-2 text-xl font-bold text-gray-800"><?php echo APP_NAME; ?></span> -->
+                        <span class="ml-2 font-bold text-gray-800">
+                            <span class="text-xl block leading-tight">Medico</span>
+                            <span class="text-xs md:text-sm block leading-tight text-gray-600">Patient Management System</span>
+                        </span>
                     </a>
                 </div>
 
