@@ -31,9 +31,9 @@
                 </div>
 
                 <!-- Form -->
-                <form id="appointmentForm" method="POST" action="<?php echo BASE_URL; ?>patient/bookAppointmentSubmit" 
-                      class="p-8 space-y-8">
-                    
+                <form id="appointmentForm" method="POST" action="<?php echo BASE_URL; ?>patient/bookAppointment"
+                    class="p-8 space-y-8">
+
                     <!-- Patient Identification -->
                     <div class="space-y-6">
                         <div class="flex items-center space-x-3">
@@ -42,7 +42,50 @@
                             </div>
                             <h2 class="text-xl font-semibold text-gray-800">Patient Identification</h2>
                         </div>
-                        
+
+                        <!-- Success Message with Patient ID -->
+                        <?php if (isset($registeredPatient)): ?>
+                            <div class="bg-green-50 border-l-4 border-green-500 p-4 rounded-r-lg mb-6">
+                                <div class="flex items-start">
+                                    <div class="flex-shrink-0">
+                                        <i class="fas fa-check-circle text-green-500 text-xl"></i>
+                                    </div>
+                                    <div class="ml-3">
+                                        <h3 class="text-sm font-medium text-green-800">Registration Successful!</h3>
+                                        <div class="mt-2">
+                                            <p class="text-sm text-green-700">
+                                                Welcome <span class="font-semibold"><?php echo htmlspecialchars($registeredPatient['first_name'] . ' ' . $registeredPatient['last_name']); ?></span>!
+                                            </p>
+                                            <div class="mt-3 bg-white p-3 rounded-lg border border-green-200">
+                                                <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                                    <div>
+                                                        <span class="text-xs text-gray-500">Patient ID:</span>
+                                                        <div class="flex items-center mt-1">
+                                                            <code class="bg-gray-100 px-3 py-1.5 rounded text-sm font-mono font-bold text-gray-800">
+                                                                <?php echo htmlspecialchars($registeredPatient['patient_id']); ?>
+                                                            </code>
+                                                            <button type="button" onclick="copyToClipboard('<?php echo $registeredPatient['patient_id']; ?>')"
+                                                                class="ml-2 text-blue-600 hover:text-blue-800 text-sm">
+                                                                <i class="fas fa-copy"></i>
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                    <div>
+                                                        <span class="text-xs text-gray-500">Phone Number:</span>
+                                                        <p class="text-sm font-medium text-gray-800 mt-1"><?php echo htmlspecialchars($registeredPatient['phone']); ?></p>
+                                                    </div>
+                                                </div>
+                                                <p class="text-xs text-gray-600 mt-3">
+                                                    <i class="fas fa-info-circle mr-1"></i>
+                                                    Your patient ID has been auto-filled below for your convenience.
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        <?php endif; ?>
+
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-2">
                                 Patient ID or Phone Number <span class="text-red-500">*</span>
@@ -52,19 +95,34 @@
                                     <i class="fas fa-search text-gray-400"></i>
                                 </div>
                                 <input type="text" name="patient_identifier" required
-                                       class="pl-10 w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition"
-                                       placeholder="Enter Patient ID or Phone Number">
+                                    value="<?php echo isset($registeredPatient) ? htmlspecialchars($registeredPatient['patient_id']) : ''; ?>"
+                                    class="pl-10 w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition"
+                                    placeholder="Enter Patient ID or Phone Number"
+                                    <?php echo isset($registeredPatient) ? 'readonly' : ''; ?>>
+                                <?php if (isset($registeredPatient)): ?>
+                                    <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                                        <i class="fas fa-check text-green-500"></i>
+                                    </div>
+                                <?php endif; ?>
                             </div>
-                            <p class="text-sm text-gray-600 mt-3 flex items-center">
-                                <i class="fas fa-info-circle mr-2 text-blue-500"></i>
-                                Not registered yet? 
-                                <a href="<?php echo BASE_URL; ?>patient/register" class="text-blue-600 hover:text-blue-800 font-medium ml-1">
-                                    Register here first
-                                </a>
-                            </p>
+
+                            <?php if (!isset($registeredPatient)): ?>
+                                <p class="text-sm text-gray-600 mt-3 flex items-center">
+                                    <i class="fas fa-info-circle mr-2 text-blue-500"></i>
+                                    Not registered yet?
+                                    <a href="<?php echo BASE_URL; ?>patient/register" class="text-blue-600 hover:text-blue-800 font-medium ml-1">
+                                        Register here first
+                                    </a>
+                                </p>
+                            <?php else: ?>
+                                <p class="text-sm text-green-600 mt-3 flex items-center">
+                                    <i class="fas fa-check-circle mr-2"></i>
+                                    Your patient ID is auto-filled. You can also use your phone number.
+                                </p>
+                            <?php endif; ?>
                         </div>
                     </div>
-                    
+
                     <!-- Doctor & Date Selection -->
                     <div class="space-y-6">
                         <div class="flex items-center space-x-3">
@@ -73,7 +131,7 @@
                             </div>
                             <h2 class="text-xl font-semibold text-gray-800">Select Doctor & Time</h2>
                         </div>
-                        
+
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <!-- Doctor Selection -->
                             <div>
@@ -84,16 +142,16 @@
                                     <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                                         <i class="fas fa-stethoscope text-gray-400"></i>
                                     </div>
-                                    <select name="doctor_id" required 
-                                            class="pl-10 w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition appearance-none">
+                                    <select name="doctor_id" required
+                                        class="pl-10 w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition appearance-none">
                                         <option value="">Choose a Doctor</option>
                                         <?php foreach ($doctors as $doctor): ?>
-                                        <option value="<?php echo $doctor['id']; ?>">
-                                            Dr. <?php echo htmlspecialchars($doctor['name']); ?>
-                                            <?php if ($doctor['specialization']): ?>
-                                            - <?php echo htmlspecialchars($doctor['specialization']); ?>
-                                            <?php endif; ?>
-                                        </option>
+                                            <option value="<?php echo $doctor['id']; ?>">
+                                                Dr. <?php echo htmlspecialchars($doctor['name']); ?>
+                                                <?php if ($doctor['specialization']): ?>
+                                                    - <?php echo htmlspecialchars($doctor['specialization']); ?>
+                                                <?php endif; ?>
+                                            </option>
                                         <?php endforeach; ?>
                                     </select>
                                     <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
@@ -101,7 +159,7 @@
                                     </div>
                                 </div>
                             </div>
-                            
+
                             <!-- Date Selection -->
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-2">
@@ -111,13 +169,13 @@
                                     <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                                         <i class="fas fa-calendar-day text-gray-400"></i>
                                     </div>
-                                    <input type="date" name="appointment_date" required 
-                                           min="<?php echo date('Y-m-d'); ?>" 
-                                           max="<?php echo date('Y-m-d', strtotime('+30 days')); ?>"
-                                           class="pl-10 w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition datepicker">
+                                    <input type="date" name="appointment_date" required
+                                        min="<?php echo date('Y-m-d'); ?>"
+                                        max="<?php echo date('Y-m-d', strtotime('+30 days')); ?>"
+                                        class="pl-10 w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition datepicker">
                                 </div>
                             </div>
-                            
+
                             <!-- Time Selection -->
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-2">
@@ -127,8 +185,8 @@
                                     <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                                         <i class="fas fa-clock text-gray-400"></i>
                                     </div>
-                                    <select name="appointment_time" required 
-                                            class="pl-10 w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition appearance-none">
+                                    <select name="appointment_time" required
+                                        class="pl-10 w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition appearance-none">
                                         <option value="">Select Time Slot</option>
                                         <option value="08:00">08:00 AM - Morning</option>
                                         <option value="09:00">09:00 AM - Morning</option>
@@ -144,7 +202,7 @@
                                     </div>
                                 </div>
                             </div>
-                            
+
                             <!-- Doctor Availability -->
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-2">Doctor Availability</label>
@@ -160,7 +218,7 @@
                             </div>
                         </div>
                     </div>
-                    
+
                     <!-- Appointment Details -->
                     <div class="space-y-6">
                         <div class="flex items-center space-x-3">
@@ -169,7 +227,7 @@
                             </div>
                             <h2 class="text-xl font-semibold text-gray-800">Appointment Details</h2>
                         </div>
-                        
+
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-2">
                                 Reason for Visit <span class="text-red-500">*</span>
@@ -179,33 +237,33 @@
                                     <i class="fas fa-comment-medical text-gray-400"></i>
                                 </div>
                                 <textarea name="reason" rows="4" required
-                                          class="pl-10 w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition"
-                                          placeholder="Please describe the reason for your visit in detail..."></textarea>
+                                    class="pl-10 w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition"
+                                    placeholder="Please describe the reason for your visit in detail..."></textarea>
                             </div>
                             <div class="mt-2 text-sm text-gray-600 flex items-center">
                                 <i class="fas fa-lightbulb mr-2 text-yellow-500"></i>
                                 Be specific to help the doctor prepare for your visit
                             </div>
                         </div>
-                        
+
                         <!-- Symptoms Checklist -->
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-3">Common Symptoms (Optional)</label>
                             <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
-                                <?php 
+                                <?php
                                 $symptoms = ['Fever', 'Headache', 'Cough', 'Fatigue', 'Nausea', 'Pain', 'Dizziness', 'Other'];
-                                foreach ($symptoms as $symptom): 
+                                foreach ($symptoms as $symptom):
                                 ?>
-                                <label class="flex items-center space-x-2 p-3 border border-gray-300 rounded-lg hover:bg-gray-50 cursor-pointer">
-                                    <input type="checkbox" name="symptoms[]" value="<?php echo $symptom; ?>" 
-                                           class="rounded text-green-600 focus:ring-green-500">
-                                    <span class="text-sm text-gray-700"><?php echo $symptom; ?></span>
-                                </label>
+                                    <label class="flex items-center space-x-2 p-3 border border-gray-300 rounded-lg hover:bg-gray-50 cursor-pointer">
+                                        <input type="checkbox" name="symptoms[]" value="<?php echo $symptom; ?>"
+                                            class="rounded text-green-600 focus:ring-green-500">
+                                        <span class="text-sm text-gray-700"><?php echo $symptom; ?></span>
+                                    </label>
                                 <?php endforeach; ?>
                             </div>
                         </div>
                     </div>
-                    
+
                     <!-- Summary Card -->
                     <div class="bg-gray-50 rounded-xl p-6 border border-gray-200">
                         <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center">
@@ -243,33 +301,33 @@
                             </div>
                         </div>
                     </div>
-                    
+
                     <!-- Form Actions -->
                     <div class="pt-8 border-t border-gray-200">
                         <div class="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
-                            <a href="<?php echo BASE_URL; ?>patient/register" 
-                               class="flex items-center text-blue-600 hover:text-blue-800 transition">
+                            <a href="<?php echo BASE_URL; ?>patient/registerForm"
+                                class="flex items-center text-blue-600 hover:text-blue-800 transition">
                                 <i class="fas fa-arrow-left mr-2"></i>
                                 Back to Registration
                             </a>
-                            
+
                             <div class="flex space-x-4">
                                 <button type="button" onclick="clearAppointmentForm()"
-                                        class="px-6 py-3 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition font-medium">
+                                    class="px-6 py-3 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition font-medium">
                                     Reset Form
                                 </button>
                                 <button type="submit"
-                                        class="px-6 py-2.5 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors duration-200 text-sm font-medium shadow-sm hover:shadow">
+                                    class="px-6 py-2.5 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors duration-200 text-sm font-medium shadow-sm hover:shadow">
                                     <i class="fas fa-calendar-check mr-2"></i>
                                     Confirm Appointment
                                 </button>
                             </div>
                         </div>
-                        
+
                         <div class="mt-6 text-center">
                             <p class="text-sm text-gray-600">
-                                Need to check an existing appointment? 
-                                <a href="<?php echo BASE_URL; ?>patient/check-appointment" class="text-green-600 hover:text-green-800 font-medium">
+                                Need to check an existing appointment?
+                                <a href="<?php echo BASE_URL; ?>patient/checkAppointmentForm" class="text-green-600 hover:text-green-800 font-medium">
                                     Check status here
                                 </a>
                             </p>
@@ -282,22 +340,41 @@
 </div>
 
 <script>
+    function copyToClipboard(text) {
+        navigator.clipboard.writeText(text).then(function() {
+            // Show success message
+            const button = event.target.closest('button');
+            const originalHTML = button.innerHTML;
+            button.innerHTML = '<i class="fas fa-check"></i>';
+            button.classList.remove('text-blue-600');
+            button.classList.add('text-green-600');
+
+            setTimeout(function() {
+                button.innerHTML = originalHTML;
+                button.classList.remove('text-green-600');
+                button.classList.add('text-blue-600');
+            }, 2000);
+        }).catch(function(err) {
+            console.error('Failed to copy: ', err);
+            alert('Failed to copy patient ID');
+        });
+    }
     // Form validation and interactivity
     function clearAppointmentForm() {
         if (confirm('Are you sure you want to reset the form?')) {
             document.getElementById('appointmentForm').reset();
         }
     }
-    
+
     // Date restrictions
     const today = new Date().toISOString().split('T')[0];
     const maxDate = new Date();
     maxDate.setDate(maxDate.getDate() + 30);
     const maxDateStr = maxDate.toISOString().split('T')[0];
-    
+
     document.querySelector('input[name="appointment_date"]').min = today;
     document.querySelector('input[name="appointment_date"]').max = maxDateStr;
-    
+
     // Form validation
     document.getElementById('appointmentForm').addEventListener('submit', function(e) {
         const patientId = document.querySelector('input[name="patient_identifier"]');
@@ -305,7 +382,7 @@
         const date = document.querySelector('input[name="appointment_date"]');
         const time = document.querySelector('select[name="appointment_time"]');
         const reason = document.querySelector('textarea[name="reason"]');
-        
+
         // Validate required fields
         if (!patientId.value.trim()) {
             e.preventDefault();
@@ -313,35 +390,35 @@
             patientId.focus();
             return false;
         }
-        
+
         if (!doctor.value) {
             e.preventDefault();
             alert('Please select a doctor');
             doctor.focus();
             return false;
         }
-        
+
         if (!date.value) {
             e.preventDefault();
             alert('Please select an appointment date');
             date.focus();
             return false;
         }
-        
+
         if (!time.value) {
             e.preventDefault();
             alert('Please select an appointment time');
             time.focus();
             return false;
         }
-        
+
         if (!reason.value.trim()) {
             e.preventDefault();
             alert('Please describe the reason for your visit');
             reason.focus();
             return false;
         }
-        
+
         // Check if date is not a Sunday
         const selectedDate = new Date(date.value);
         if (selectedDate.getDay() === 0) {
@@ -350,12 +427,12 @@
             date.focus();
             return false;
         }
-        
+
         // Show loading state
         const submitBtn = this.querySelector('button[type="submit"]');
         submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Booking...';
         submitBtn.disabled = true;
-        
+
         // Show confirmation
         if (!confirm('Are you sure you want to book this appointment?')) {
             e.preventDefault();
@@ -364,12 +441,12 @@
             return false;
         }
     });
-    
+
     // Real-time date validation
     document.querySelector('input[name="appointment_date"]').addEventListener('change', function() {
         const selectedDate = new Date(this.value);
         const day = selectedDate.getDay();
-        
+
         if (day === 0) { // Sunday
             alert('Note: The clinic is closed on Sundays. Please select another day.');
         }
@@ -389,20 +466,20 @@
         top: 0;
         width: auto;
     }
-    
+
     input[type="checkbox"]:checked {
         background-color: #10B981;
         border-color: #10B981;
     }
-    
+
     .transition {
         transition: all 0.3s ease;
     }
-    
+
     .shadow-lg {
         box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
     }
-    
+
     .shadow-xl {
         box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
     }

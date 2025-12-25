@@ -1,6 +1,7 @@
 <?php
-// controllers/PatientController.php
-
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
 require_once dirname(__DIR__) . '/config/constants.php';
 require_once dirname(__DIR__) . '/config/Database.php';
 
@@ -18,11 +19,11 @@ class PatientController
     {
         $title = 'Patient Registration';
         $showNavbar = false; // Use public layout
-        
+
         ob_start();
         include dirname(__DIR__) . '/views/patient/register.php';
         $content = ob_get_clean();
-        
+
         include dirname(__DIR__) . '/views/layouts/public.php';
     }
 
@@ -32,10 +33,12 @@ class PatientController
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             // Generate unique patient ID
             $patient_id = 'PAT-' . date('Ymd') . '-' . rand(1000, 9999);
-            
+
             try {
                 // Check if email already exists
                 if (!empty($_POST['email'])) {
+                    // var_dump($_POST['email']);
+                    // exit();
                     $checkStmt = $this->db->prepare("SELECT id FROM patients WHERE email = ?");
                     $checkStmt->execute([$_POST['email']]);
                     if ($checkStmt->fetch()) {
@@ -44,22 +47,24 @@ class PatientController
                         exit();
                     }
                 }
-                
+
                 // Insert patient
                 $stmt = $this->db->prepare("
-                    INSERT INTO patients (
-                        patient_id, first_name, last_name, date_of_birth, gender,
-                        phone, email, address, emergency_contact_name, emergency_contact_phone,
-                        blood_group, medical_history, allergies, created_by
+                    INSERT INTO `patients` (
+                        `patient_id`, `first_name`, last_name, date_of_birth, gender,
+                        `phone`, `email`, `address`, `emergency_contact_name`, `emergency_contact_phone`,
+                        `blood_group`, `medical_history`, `allergies`, `created_by`
                     ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 ");
-                
-                // Get current admin user ID or use 1 as default
-                $created_by = 1; // Default admin user
+
+                // Get current admin user ID or use 2 as default
+                $created_by = 2; // Default admin user
                 if (isset($_SESSION['user_id'])) {
                     $created_by = $_SESSION['user_id'];
+                    // var_dump($created_by);
+                    // exit();
                 }
-                
+
                 $stmt->execute([
                     $patient_id,
                     $_POST['first_name'],
@@ -76,16 +81,23 @@ class PatientController
                     $_POST['allergies'] ?? null,
                     $created_by
                 ]);
-                
+
                 $patient_id_db = $this->db->lastInsertId();
-                
+                $_SESSION['registered_patient'] = [
+                    'id' => $patient_id_db,
+                    'patient_id' => $patient_id,
+                    'first_name' => $_POST['first_name'],
+                    'last_name' => $_POST['last_name'],
+                    'phone' => $_POST['phone']
+                ];
+                // var_dump($patient_id_db);
+                // exit();
                 $_SESSION['flash']['success'] = 'Registration successful! Your Patient ID is: ' . $patient_id;
                 $_SESSION['registered_patient_id'] = $patient_id_db;
-                
+
                 // Redirect to appointment booking
-                header('Location: ' . BASE_URL . 'patient/book-appointment');
+                header('Location: ' . BASE_URL . 'patient/bookAppointmentForm');
                 exit();
-                
             } catch (PDOException $e) {
                 $_SESSION['flash']['error'] = 'Registration failed. Please try again.';
                 header('Location: ' . BASE_URL . 'patient/register');
@@ -99,14 +111,17 @@ class PatientController
     {
         // Get available doctors
         $doctors = $this->getAvailableDoctors();
-        
+
+        // Get registered patient data from session
+        $registeredPatient = $_SESSION['registered_patient'] ?? null;
+
         $title = 'Book Appointment';
         $showNavbar = false;
-        
+
         ob_start();
         include dirname(__DIR__) . '/views/patient/book-appointment.php';
         $content = ob_get_clean();
-        
+
         include dirname(__DIR__) . '/views/layouts/public.php';
     }
 
@@ -117,18 +132,18 @@ class PatientController
             try {
                 // Generate appointment number
                 $appointment_number = 'APT-' . date('Ymd') . '-' . rand(1000, 9999);
-                
+
                 // Check if patient exists
                 $patientStmt = $this->db->prepare("SELECT id FROM patients WHERE patient_id = ? OR phone = ?");
                 $patientStmt->execute([$_POST['patient_identifier'], $_POST['patient_identifier']]);
                 $patient = $patientStmt->fetch();
-                
+
                 if (!$patient) {
                     $_SESSION['flash']['error'] = 'Patient not found. Please register first.';
                     header('Location: ' . BASE_URL . 'patient/register');
                     exit();
                 }
-                
+
                 // Check doctor availability
                 $doctorStmt = $this->db->prepare("
                     SELECT COUNT(*) as count 
@@ -140,13 +155,13 @@ class PatientController
                 ");
                 $doctorStmt->execute([$_POST['doctor_id'], $_POST['appointment_date'], $_POST['appointment_time']]);
                 $existing = $doctorStmt->fetch();
-                
+
                 if ($existing['count'] > 0) {
                     $_SESSION['flash']['error'] = 'Selected time slot is not available. Please choose another time.';
-                    header('Location: ' . BASE_URL . 'patient/book-appointment');
+                    header('Location: ' . BASE_URL . 'patient/bookAppointmentForm');
                     exit();
                 }
-                
+
                 // Insert appointment
                 $stmt = $this->db->prepare("
                     INSERT INTO appointments (
@@ -154,12 +169,12 @@ class PatientController
                         appointment_time, reason, status, created_by
                     ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
                 ");
-                
-                $created_by = 1; // Default admin user
+
+                $created_by = 2; // Default admin user
                 if (isset($_SESSION['user_id'])) {
                     $created_by = $_SESSION['user_id'];
                 }
-                
+
                 $stmt->execute([
                     $appointment_number,
                     $patient['id'],
@@ -170,18 +185,17 @@ class PatientController
                     'Scheduled',
                     $created_by
                 ]);
-                
+
                 $appointment_id = $this->db->lastInsertId();
-                
+
                 $_SESSION['flash']['success'] = 'Appointment booked successfully! Your Appointment Number is: ' . $appointment_number;
                 $_SESSION['appointment_number'] = $appointment_number;
-                
-                header('Location: ' . BASE_URL . 'patient/appointment-success');
+
+                header('Location: ' . BASE_URL . 'patient/appointmentSuccess');
                 exit();
-                
             } catch (PDOException $e) {
                 $_SESSION['flash']['error'] = 'Appointment booking failed. Please try again.';
-                header('Location: ' . BASE_URL . 'patient/book-appointment');
+                header('Location: ' . BASE_URL . 'patient/bookAppointmentForm');
                 exit();
             }
         }
@@ -192,13 +206,13 @@ class PatientController
     {
         $title = 'Appointment Booked Successfully';
         $showNavbar = false;
-        
+
         $appointment_number = $_SESSION['appointment_number'] ?? '';
-        
+
         ob_start();
         include dirname(__DIR__) . '/views/patient/appointment-success.php';
         $content = ob_get_clean();
-        
+
         include dirname(__DIR__) . '/views/layouts/public.php';
     }
 
@@ -207,11 +221,11 @@ class PatientController
     {
         $title = 'Check Appointment Status';
         $showNavbar = false;
-        
+
         ob_start();
         include dirname(__DIR__) . '/views/patient/check-appointment.php';
         $content = ob_get_clean();
-        
+
         include dirname(__DIR__) . '/views/layouts/public.php';
     }
 
@@ -221,7 +235,7 @@ class PatientController
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $appointment_number = $_POST['appointment_number'] ?? '';
             $phone = $_POST['phone'] ?? '';
-            
+
             $stmt = $this->db->prepare("
                 SELECT a.*, p.first_name, p.last_name, p.phone,
                        CONCAT(u.first_name, ' ', u.last_name) as doctor_name
@@ -230,17 +244,17 @@ class PatientController
                 JOIN users u ON a.doctor_id = u.id
                 WHERE a.appointment_number = ? AND p.phone = ?
             ");
-            
+
             $stmt->execute([$appointment_number, $phone]);
             $appointment = $stmt->fetch();
-            
+
             $title = 'Appointment Status';
             $showNavbar = false;
-            
+
             ob_start();
             include dirname(__DIR__) . '/views/patient/appointment-status.php';
             $content = ob_get_clean();
-            
+
             include dirname(__DIR__) . '/views/layouts/public.php';
         }
     }
@@ -258,4 +272,3 @@ class PatientController
         return $stmt->fetchAll();
     }
 }
-?>

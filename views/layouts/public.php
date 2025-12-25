@@ -42,7 +42,7 @@
             <div class="flex justify-between items-center h-16">
                 <!-- Logo -->
                 <div class="flex items-center">
-                    <a href="<?php echo BASE_URL; ?>patient/register" class="flex items-center">
+                    <a href="<?php echo BASE_URL; ?>patient/registerForm" class="flex items-center">
                         <div class="h-8 w-8 bg-blue-600 rounded-md flex items-center justify-center">
                             <i class="fas fa-heartbeat text-white"></i>
                         </div>
@@ -56,19 +56,19 @@
                 <!-- Public Navigation Links -->
                 <!-- Public Navigation Links -->
                 <div class="hidden md:flex items-center space-x-8">
-                    <a href="<?php echo BASE_URL; ?>patient/register"
+                    <a href="<?php echo BASE_URL; ?>patient/registerForm"
                         class="text-gray-700 hover:text-blue-600 font-medium px-3 py-2 rounded-md hover:bg-blue-50 transition-colors duration-200">
                         <i class="fas fa-user-plus mr-2"></i>
                         Registration
                     </a>
 
-                    <a href="<?php echo BASE_URL; ?>patient/book-appointment"
+                    <a href="<?php echo BASE_URL; ?>patient/bookAppointmentForm"
                         class="text-gray-700 hover:text-green-600 font-medium px-3 py-2 rounded-md hover:bg-green-50 transition-colors duration-200">
                         <i class="fas fa-calendar-check mr-2"></i>
                         Book Appointment
                     </a>
 
-                    <a href="<?php echo BASE_URL; ?>patient/check-appointment"
+                    <a href="<?php echo BASE_URL; ?>patient/checkAppointmentForm"
                         class="text-gray-700 hover:text-purple-600 font-medium px-3 py-2 rounded-md hover:bg-purple-50 transition-colors duration-200">
                         <i class="fas fa-search mr-2"></i>
                         Check Status
@@ -92,19 +92,19 @@
             <!-- Mobile Navigation -->
             <div id="mobile-menu" class="md:hidden hidden py-4 border-t border-gray-200">
                 <div class="space-y-2 px-4">
-                    <a href="<?php echo BASE_URL; ?>patient/register"
+                    <a href="<?php echo BASE_URL; ?>patient/registerForm"
                         class="flex items-center px-4 py-3 text-gray-700 hover:bg-blue-50 hover:text-blue-600 rounded-md transition-colors">
                         <i class="fas fa-user-plus mr-3 w-5 text-center"></i>
                         Patient Registration
                     </a>
 
-                    <a href="<?php echo BASE_URL; ?>patient/book-appointment"
+                    <a href="<?php echo BASE_URL; ?>patient/bookAppointmentForm"
                         class="flex items-center px-4 py-3 text-gray-700 hover:bg-green-50 hover:text-green-600 rounded-md transition-colors">
                         <i class="fas fa-calendar-check mr-3 w-5 text-center"></i>
                         Book Appointment
                     </a>
 
-                    <a href="<?php echo BASE_URL; ?>patient/check-appointment"
+                    <a href="<?php echo BASE_URL; ?>patient/checkAppointmentForm"
                         class="flex items-center px-4 py-3 text-gray-700 hover:bg-purple-50 hover:text-purple-600 rounded-md transition-colors">
                         <i class="fas fa-search mr-3 w-5 text-center"></i>
                         Check Appointment

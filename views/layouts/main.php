@@ -68,13 +68,14 @@
     }
     ?>
 
-    <main class="min-h-screen">
+    <!-- <main class="min-h-screen pt-16"> -->
+    <main class="min-h-screen <?php echo (isset($showNavbar) && $showNavbar && isset($_SESSION['user_id'])) ? 'pt-16' : ''; ?>">
         <?php
         // Display flash messages
         if (isset($_SESSION['flash'])) {
             foreach ($_SESSION['flash'] as $type => $message) {
                 $bgColor = $type == 'success' ? 'bg-green-100 border-green-400 text-green-700' : ($type == 'error' ? 'bg-red-100 border-red-400 text-red-700' :
-                        'bg-blue-100 border-blue-400 text-blue-700');
+                    'bg-blue-100 border-blue-400 text-blue-700');
                 echo "<div class='flash-message $bgColor border px-4 py-3 rounded mx-4 mt-4'>" .
                     htmlspecialchars($message) . "</div>";
                 unset($_SESSION['flash'][$type]);

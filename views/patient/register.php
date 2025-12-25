@@ -31,7 +31,7 @@
                 </div>
 
                 <!-- Form -->
-                <form id="registrationForm" method="POST" action="<?php echo BASE_URL; ?>patient/registerSubmit"
+                <form id="registrationForm" method="POST" action="<?php echo BASE_URL; ?>patient/register"
                     class="p-8 space-y-8" x-data="registrationForm()" x-init="initForm()">
 
                     <!-- Personal Information -->

@@ -17,7 +17,7 @@ $root_path = dirname(__DIR__);
 require_once $root_path . '/config/constants.php';
 
 // Get URL
-$url = $_GET['url'] ?? 'auth/login';
+// $url = $_GET['url'] ?? 'auth/login';
 $url = $_GET['url'] ?? 'patient/registerForm';
 
 // Remove trailing slash
@@ -39,6 +39,7 @@ $routes = [
     'reports' => 'ReportsController',
     'system-settings' => 'SystemSettingsController',
     'patient' => 'PatientController', 
+    'doctor' => 'DoctorController',
     // Add more controllers here as we create them
 ];
 
